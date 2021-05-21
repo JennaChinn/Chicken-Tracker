@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="style.css">
+    <script>
+        window.onload=()=> {
+            let objs=JSON.parse(localStorage.getItem("objs"));
+            let chicks = JSON.parse(localStorage.getItem("chicks"));
+            let keys=Object.keys(objs);
+            let chickens={};
+            for (let i=0; i<Object.keys(chicks).length; i++) {
+              chickens[Object.keys(chicks)[i]] = {
+                totalEggs:0,
+                eggsPerMonth:0
+              }
+            }
+            let girls=Object.keys(chicks);
+            
+            for(let i=0;i<keys.length;i++) {
+                let thisMonth=keys[i];
+                for (let j=0;j<girls.length;j++) {
+                    chickens[girls[j]].totalEggs+=objs[thisMonth][girls[j]];
+                }//for each chicken
+            }//for each eggsPerMonth
+
+            let loc=document.getElementById("chickens");
+            for (let i=0;i<girls.length;i++) {
+                let thisChicken=chickens[girls[i]];
+                thisChicken.eggsPerMonth=thisChicken.totalEggs/keys.length;
+                if (!thisChicken.eggsPerMonth) thisChicken.eggsPerMonth=0;
+                let name=document.createElement("h3");
+                let stats=document.createElement("p");
+                stats.innerHTML=(`Eggs per month: ${thisChicken.eggsPerMonth}<br><br>Total Eggs: ${thisChicken.totalEggs}`);
+                name.innerHTML=girls[i];
+                loc.appendChild(name);
+                loc.appendChild(stats);
+            }//for each chicken
+        }//onload function
+    </script>
+    <title>Stats</title>
+</head>
+<body>
+    <h1>Statistics</h1>
+    <div id="chickens"></div>
+    <button onclick = "window.location.href = 'index.html'">Back</button>
+</body>
+</html>

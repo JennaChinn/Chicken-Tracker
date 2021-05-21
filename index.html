@@ -1,0 +1,18 @@
+<html>
+<head>
+    <title>Chicken Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        window.onload=()=>{
+            if (!localStorage.getItem("objs")) localStorage.setItem("objs",JSON.stringify({}));
+            if (!localStorage.getItem("chicks")) localStorage.setItem("chicks",JSON.stringify({}));
+        }
+    </script>
+</head>
+<body>
+    <h1>ChickenTracker</h1>
+    <button onclick="window.location.href='./logging.html'">Log Eggs</button>
+    <button onclick="window.location.href='./stats.html'">Statistics</button>
+    <button onclick = "window.location.href = './sets.html'">Settings</button>
+</body>
+</html>

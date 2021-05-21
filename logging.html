@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        window.onload=()=>{
+            const chicks=JSON.parse(localStorage.getItem("chicks"));
+            const table=document.getElementById('table');
+            let date=new Date();
+            let month=date.getMonth();
+            let months=["January","February","March","April","May","June","July","August","September","October","November","December"];
+            document.getElementById("month").innerHTML=months[month];
+            
+            let old=JSON.parse(localStorage.getItem("objs"));
+            if (old[`${date.getMonth()+1}/${date.getFullYear()}`]) {
+                table.innerHTML=old[`${date.getMonth()+1}/${date.getFullYear()}`]['tableData']['html'];
+                let amtChecked=old[`${date.getMonth()+1}/${date.getFullYear()}`]['tableData']['checked'];
+                for (let i=0;i<amtChecked.length;i++) {
+                    let thisChecked=amtChecked[Object.keys(amtChecked)[i]];
+                    table.rows[thisChecked[0]].cells[thisChecked[1]].firstChild.rows[0].cells[thisChecked[2]].firstChild.checked=true;
+                }//add in last checked
+                return;
+            }//retrieve old
+            
+            let today=date.getDate();
+            let day=date.getDay();
+            let y=date.getFullYear()-2000;
+            if (month==0||month==1) y--;
+            let firstWeekDay=new Date(date.getFullYear(),date.getMonth(),1);
+            let firstOfMonth=firstWeekDay.getDay();
+            let amtDays=30;
+            if (month==1) {
+                if (date.getFullYear%4==0) amtDays=29;
+                else amtDays=30;
+            }//if feb
+            if ((month%2==0&&month<=6)||(month%2==1&&month>=7)) amtDays=31;
+            let thisDay=Math.abs(firstOfMonth);
+            let firstDay=true;
+            let row=table.rows[0],kyou,thisOne,newRow,newCell,newBox;
+            
+            for (let i=0;i<amtDays;i++) {
+                if (firstDay||thisDay==0) row=table.insertRow(table.rows.length);
+                if (firstDay) for (let j=0;j<firstOfMonth;j++) row.insertCell(i);
+                firstDay=false;
+                kyou=row.insertCell(thisDay);
+                thisOne=document.createElement('table');
+                newRow=thisOne.insertRow(0);
+                for (let j=0;j<Object.keys(chicks).length;j++) {
+                    newCell=newRow.insertCell(j);
+                    newBox=document.createElement('input');
+                    newBox.type="checkbox";
+                    newCell.appendChild(newBox);
+                    newCell.bgColor=chicks[Object.keys(chicks)[j]];
+                }//create cells
+                thisOne.border="1px";
+                kyou.appendChild(thisOne);
+                if (thisDay==6) thisDay=0;
+                else thisDay++;
+            }//for i
+        }//onload function
+        
+        const exit=()=> {
+            let leave=true;
+            if (document.getElementById("save?").innerHTML=="") leave=window.confirm("Are you sure you want to exit? Any unsaved changes will be lost.");
+            if (leave) window.location.href="./index.html";
+        }//exit
+        
+        const save=()=> {
+            let date=new Date();
+            let chicks = JSON.parse(localStorage.getItem("chicks"));
+            let girls=Object.keys(chicks);
+            let table=document.getElementById('table');
+            let objs=JSON.parse(localStorage.getItem("objs"));
+            let tables=JSON.parse(localStorage.getItem("tables"));
+            let obj={
+               'tableData':{
+                  'html':"",
+                  'checked':[]
+                }
+            };
+            for (let i=0; i<girls.length; i++) obj[girls[i]] = 0;
+            let thisTable;
+            for (let i=1;i<table.rows.length;i++) {
+                row=table.rows[i];
+                for (let j=0;j<row.cells.length;j++) {
+                    cell=row.cells[j];
+                    if (cell.innerHTML!="") {
+                        thisTable=cell.firstChild.rows[0].cells;
+                        for (let k=0; k<girls.length; k++) {
+                          if (thisTable[k].firstChild.checked) {
+                            obj[girls[k]]++;
+                            obj['tableData']['checked'].push([i,j,k]);
+                          }
+                        }
+                    }//if not blank
+                }//for each cell in row
+            }//for each row
+            obj['tableData']['html']=table.innerHTML;
+            objs[`${date.getMonth()+1}/${date.getFullYear()}`]=obj;
+            localStorage.setItem("objs",JSON.stringify(objs));
+            document.getElementById("save?").innerHTML="Saved!";
+        }//save
+    </script>
+    <title>Logging</title>
+</head>
+<body>
+    <h1>Log Eggs</h1>
+    <h3 id="month"></h3>
+    <table border="1px" id="table" align="center">
+        <tr>
+            <th>S</th>
+            <th>M</th>
+            <th>T</th>
+            <th>W</th>
+            <th>T</th>
+            <th>F</th>
+            <th>S</th>
+        </tr>
+    </table>
+    <p id="save?"></p>
+    <button onclick="exit()">Back</button>
+    <button onclick="save()">Save</button>
+</body>
+</html>

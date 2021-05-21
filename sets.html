@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <script>
+      window.onload = () => {
+        var chicks=JSON.parse(localStorage.getItem("chicks"));
+        let table=document.createElement("table");
+        for (let i=0; i<Object.keys(chicks).length; i++) {
+          let r=table.insertRow();
+          let c1=r.insertCell()
+          c1.innerHTML=Object.keys(chicks)[i];
+          c1.style.color = chicks[Object.keys(chicks)[i]];
+          let c=r.insertCell();
+          let dB=document.createElement("button");
+          dB.onclick = () => del(Object.keys(chicks)[i]);
+          dB.innerHTML="Delete";
+          c.appendChild(dB);
+        }
+        if (table.rows.length==0) {
+          let p=document.createElement("p");
+          p.innerHTML="No chickens";
+          p.style.cssText="color:red";
+          document.getElementById("cs").appendChild(p);
+        }
+        else document.getElementById("cs").appendChild(table);
+      }
+      const del = (name) => {
+        var chicks = JSON.parse(localStorage.getItem("chicks"));
+        let conf=window.confirm("Are you sure you want to delete this profile? This action cannot be undone.");
+        if (conf) delete chicks[name];
+        localStorage.setItem("chicks",JSON.stringify(chicks));
+        window.location.reload();
+      }
+      const newBird = () => {
+        let div=document.createElement("div");
+        div.className="bird";
+        div.id="div";
+        document.body.appendChild(div);
+
+        let nImp=document.createElement("input");
+        nImp.type="text";
+        nImp.name="name";
+        nImp.id="name";
+        let nLab=document.createElement("label");
+        nLab.for="name";
+        nLab.innerHTML="New chicken's name";
+        div.appendChild(nLab);
+        div.appendChild(nImp);
+
+        div.appendChild(document.createElement("br"));
+        
+        for (let i=0; i<3; i++) {
+          let cInp=document.createElement("input");
+          cInp.type="number";
+          cInp.max=255;
+          cInp.min=0;
+          cInp.name="Color"+i;
+          cInp.id="Color"+i;
+          let cLab=document.createElement("label");
+          cLab.for="Color"+i;
+          cLab.innerHTML = i==0?("Red"):(i==1?"Green":"Blue");
+          div.appendChild(cLab);
+          div.appendChild(cInp);
+        }
+
+        let b=document.createElement("button");
+        b.innerHTML="Save";
+        b.onclick = () => save();
+        div.appendChild(b);
+
+        let c=document.createElement("button");
+        c.innerHTML="Cancel";
+        c.onclick = () => close(false);
+        div.appendChild(c);
+      }
+      const save = () => {
+        let chs = JSON.parse(localStorage.getItem("chicks"));
+        let name=document.getElementById("name").value;
+        if (name=="" || name in chs) {
+          close(true);
+          return;
+        }
+        let totStr="";
+        for (let i=0; i<3; i++) {
+          let a=document.getElementById("Color"+i).value;
+          try {a=Number(a);} catch (err) {close(true); return;}
+          if (a>255 || a<0) {close(true);return;}
+          a=a.toString(16);
+          totStr+=(a.length==1?"0":"")+a;
+        }
+        chs[name] = "#"+totStr;
+        if (Object.keys(chs).length==0) chs={name:"#"+totStr};
+        localStorage.setItem("chicks",JSON.stringify(chs));
+        window.location.reload();
+      }
+      const close = (invalid) => {
+        if (invalid) alert("Invalid input");
+        document.getElementById("div").remove();
+      }
+      const clearData=()=> {
+        let del=window.confirm("Are you sure you want to delete all of the data?");
+        if (del) {
+          localStorage.clear();
+          window.location.href = "index.html";
+        }//delete
+      }//clear
+    </script>
+  </head>
+  <body>
+    <h1>Settings</h1>
+    <h2>Chickens</h2>
+    <div id="cs"></div>
+    <button onclick = "newBird()">Add New Chicken</button>
+    <button onclick="clearData()">Clear Data</button>
+    <button onclick = 'window.location.href = "/index.html"'>Back</button>
+  </body>
+</html>
